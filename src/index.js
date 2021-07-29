@@ -26,31 +26,43 @@ function checkIfUserAccountExists(request, response, next) {
 app.post("/users", (request, response) => {
   const { name, username } = request.body
 
-  users.push({
+  const userAlreadyExists = users.some((user) => user.username === username)
+
+  if (userAlreadyExists) {
+    return response
+      .status(400)
+      .json({ error: "User already exists, try using a different username." })
+  }
+
+  const newUser = {
     id: uuidv4(),
     name,
     username,
     todos: [],
-  })
+  }
+
+  users.push(newUser)
+
+  return response.status(201).json(newUser)
 })
 
-app.get("/todos", checksExistsUserAccount, (request, response) => {
+app.get("/todos", checkIfUserAccountExists, (request, response) => {
   // Complete aqui
 })
 
-app.post("/todos", checksExistsUserAccount, (request, response) => {
+app.post("/todos", checkIfUserAccountExists, (request, response) => {
   // Complete aqui
 })
 
-app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
+app.put("/todos/:id", checkIfUserAccountExists, (request, response) => {
   // Complete aqui
 })
 
-app.patch("/todos/:id/done", checksExistsUserAccount, (request, response) => {
+app.patch("/todos/:id/done", checkIfUserAccountExists, (request, response) => {
   // Complete aqui
 })
 
-app.delete("/todos/:id", checksExistsUserAccount, (request, response) => {
+app.delete("/todos/:id", checkIfUserAccountExists, (request, response) => {
   // Complete aqui
 })
 
