@@ -52,7 +52,30 @@ app.get("/todos", checkIfUserAccountExists, (request, response) => {
 })
 
 app.post("/todos", checkIfUserAccountExists, (request, response) => {
-  // Complete aqui
+  const { user } = request
+  const { title, deadline } = request.body
+
+  const formattedDeadline = new Date(deadline.replace(/-/g, "/"))
+  const deadlineIsPastDate =
+    formattedDeadline.getTime() < new Date().setHours(0, 0, 0, 0)
+
+  if (!formattedDeadline.valueOf() || deadlineIsPastDate) {
+    return response
+      .status(400)
+      .json({ error: "Insert a valid date (e.g., yyyy-mm-dd)!" })
+  }
+
+  const newTodo = {
+    id: uuidv4(),
+    title: title,
+    done: false,
+    deadline: formattedDeadline,
+    created_at: new Date(),
+  }
+
+  user.todos.push(newTodo)
+
+  return response.status(201).json(newTodo)
 })
 
 app.put("/todos/:id", checkIfUserAccountExists, (request, response) => {
