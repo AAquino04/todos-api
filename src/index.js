@@ -55,21 +55,11 @@ app.post("/todos", checkIfUserAccountExists, (request, response) => {
   const { user } = request
   const { title, deadline } = request.body
 
-  const formattedDeadline = new Date(deadline.replace(/-/g, "/"))
-  const deadlineIsPastDate =
-    formattedDeadline.getTime() < new Date().setHours(0, 0, 0, 0)
-
-  if (!formattedDeadline.valueOf() || deadlineIsPastDate) {
-    return response
-      .status(400)
-      .json({ error: "Insert a valid date (e.g., yyyy-mm-dd)!" })
-  }
-
   const newTodo = {
     id: uuidv4(),
     title,
     done: false,
-    deadline: formattedDeadline,
+    deadline: deadline,
     created_at: new Date(),
   }
 
@@ -83,16 +73,6 @@ app.put("/todos/:id", checkIfUserAccountExists, (request, response) => {
   const { title, deadline } = request.body
   const { id } = request.params
 
-  const formattedDeadline = new Date(deadline.replace(/-/g, "/"))
-  const deadlineIsPastDate =
-    formattedDeadline.getTime() < new Date().setHours(0, 0, 0, 0)
-
-  if (!formattedDeadline.valueOf() || deadlineIsPastDate) {
-    return response
-      .status(400)
-      .json({ error: "Insert a valid date (e.g., yyyy-mm-dd)!" })
-  }
-
   const todo = user.todos.find((todo) => todo.id === id)
 
   if (!todo) {
@@ -102,7 +82,7 @@ app.put("/todos/:id", checkIfUserAccountExists, (request, response) => {
   }
 
   todo.title = title
-  todo.deadline = formattedDeadline
+  todo.deadline = deadline
 
   return response.json(todo)
 })
