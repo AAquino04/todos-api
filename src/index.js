@@ -125,7 +125,20 @@ app.patch("/todos/:id/done", checkIfUserAccountExists, (request, response) => {
 })
 
 app.delete("/todos/:id", checkIfUserAccountExists, (request, response) => {
-  // Complete aqui
+  const { user } = request
+  const { id } = request.params
+
+  const todoIndex = user.todos.findIndex((todo) => todo.id === id)
+
+  if (todoIndex === -1) {
+    return response
+      .status(404)
+      .json({ error: "Todo not found, insert a valid id." })
+  }
+
+  user.todos.splice(todoIndex, 1)
+
+  return response.status(204).send()
 })
 
 module.exports = app
