@@ -95,6 +95,12 @@ app.put("/todos/:id", checkIfUserAccountExists, (request, response) => {
 
   const todo = user.todos.find((todo) => todo.id === id)
 
+  if (!todo) {
+    return response
+      .status(404)
+      .json({ error: "Todo not found, insert a valid id." })
+  }
+
   todo.title = title
   todo.deadline = formattedDeadline
 
@@ -102,7 +108,14 @@ app.put("/todos/:id", checkIfUserAccountExists, (request, response) => {
 })
 
 app.patch("/todos/:id/done", checkIfUserAccountExists, (request, response) => {
-  // Complete aqui
+  const { user } = request
+  const { id } = request.params
+
+  const todo = user.todos.find((todo) => todo.id === id)
+
+  todo.done = true
+
+  return response.json(todo)
 })
 
 app.delete("/todos/:id", checkIfUserAccountExists, (request, response) => {
