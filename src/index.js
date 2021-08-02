@@ -67,7 +67,7 @@ app.post("/todos", checkIfUserAccountExists, (request, response) => {
 
   const newTodo = {
     id: uuidv4(),
-    title: title,
+    title,
     done: false,
     deadline: formattedDeadline,
     created_at: new Date(),
@@ -79,7 +79,26 @@ app.post("/todos", checkIfUserAccountExists, (request, response) => {
 })
 
 app.put("/todos/:id", checkIfUserAccountExists, (request, response) => {
-  // Complete aqui
+  const { user } = request
+  const { title, deadline } = request.body
+  const { id } = request.params
+
+  const formattedDeadline = new Date(deadline.replace(/-/g, "/"))
+  const deadlineIsPastDate =
+    formattedDeadline.getTime() < new Date().setHours(0, 0, 0, 0)
+
+  if (!formattedDeadline.valueOf() || deadlineIsPastDate) {
+    return response
+      .status(400)
+      .json({ error: "Insert a valid date (e.g., yyyy-mm-dd)!" })
+  }
+
+  const todo = user.todos.find((todo) => todo.id === id)
+
+  todo.title = title
+  todo.deadline = formattedDeadline
+
+  return response.json(todo)
 })
 
 app.patch("/todos/:id/done", checkIfUserAccountExists, (request, response) => {
